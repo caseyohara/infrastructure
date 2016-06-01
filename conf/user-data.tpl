@@ -12,11 +12,9 @@ coreos:
     group: stable
 
   etcd2:
-    discovery: ${file("private/etcd/discovery-url")}
-    advertise-client-urls: "http://$private_ipv4:2379"
-    initial-advertise-peer-urls: "http://$private_ipv4:2380"
+    initial-cluster: core-1=http://core-1.brandfolder.host:2380,core-2=http://core-2.brandfolder.host:2380,core-3=http://core-3.brandfolder.host:2380,core-4=http://core-4.brandfolder.host:2380,core-5=http://core-5.brandfolder.host:2380
     listen-client-urls: "http://0.0.0.0:2379,http://0.0.0.0:4001"
-    listen-peer-urls: "http://$private_ipv4:2380,http://$private_ipv4:7001"
+    proxy: on
 
   units:
     ${join("\n    ", split("\n", units))}
