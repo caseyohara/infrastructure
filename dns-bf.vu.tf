@@ -3,12 +3,17 @@ resource "aws_route53_zone" "bf-vu" {
    name = "bf.vu"
 }
 
-resource "aws_route53_record" "A-bf-vu" {
-  zone_id = "${aws_route53_zone.bf-vu.zone_id}"
-  name = "bf.vu"
-  ttl = 3600
-  type = "A"
-  records = ["162.243.199.47"]
+# Alias Bf.vu to the ELB
+resource "aws_route53_record" "a-bf-vu" {
+   zone_id = "${aws_route53_zone.brandfolder-com.zone_id}"
+   name = "bf.vu"
+   type = "A"
+
+   alias {
+     name = "${aws_elb.brandfolder-all.dns_name}"
+     zone_id = "${aws_elb.brandfolder-all.zone_id}"
+     evaluate_target_health = true
+    }
 }
 
 resource "aws_route53_record" "71CDE341CEF6A8E1C863429950BB2017-bf-vu" {
