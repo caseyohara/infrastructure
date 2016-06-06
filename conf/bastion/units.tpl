@@ -51,6 +51,7 @@
       users=`docker run --net host --rm brandfolder/github-keys:latest --token $github_token brandfolder bastion list-users --downcase`; \
       for user in $users ; do \
         useradd -p "*" -m "$user" -U -G core 2> /dev/null ; \
+        usermod -a -G `groups | tr ' ' ','` "$user" ; \
         if [ $? -eq 0 ] ; then \
           cp /home/core/.ssh/deis /home/$user/.ssh/deis ; \
           chown $user /home/$user/.ssh/deis ; \
