@@ -12,9 +12,12 @@
     if [ -z "$COMMAND" ] ; then echo "command required" && exit 2 ; fi
 
     # Verify the unit
-    UNIT=`fleetctl list-units -fields unit | grep -E "${APP}_v[0-9]+\." | sed s/\.service// | head -1`
-    if [ -z "$UNIT" ] ; then echo "application not found" && exit 2 ; fi
+    APP_WITH_TAG=`fleetctl list-unit-files -fields unit | grep -E "${APP}_v[0-9]+\." | sed -r s/_\(v[0-9]+\)\.\(.+\)\.service/:\\\1/ | head -1`
+    if [ -z "$APP_WITH_TAG" ] ; then echo "application not found" && exit 2 ; fi
+    APP_WITH_VERSION=`echo $APP_WITH_TAG | tr ':' '_'`
+    RAND=`openssl rand -hex 3`
+    IMAGE=$(etcdctl get /deis/registry/host 2>&1):$(etcdctl get /deis/registry/port 2>&1)/$APP_WITH_TAG
 
     # Run the command
-    echo "running \`$COMMAND\` on '$UNIT'..."
-    fleetctl ssh $UNIT "docker exec -it $UNIT bash -c 'export PATH=./bin:$PATH ; gem install bundler &> /dev/null ; exec $COMMAND'"
+    echo "running \`$COMMAND\` on '$APP'..."
+    docker run --name "$APP_WITH_VERSION-$USER-$RAND" --rm -it $IMAGE $COMMAND
