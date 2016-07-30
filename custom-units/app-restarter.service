@@ -9,6 +9,7 @@ ExecStart=/bin/bash -c '\
   for UNIT in $UNITS ; do \
     fleetctl stop $UNIT ;\
     fleetctl start $UNIT ;\
+    sleep 60 ;\
 done'
 
 [X-Fleet]
